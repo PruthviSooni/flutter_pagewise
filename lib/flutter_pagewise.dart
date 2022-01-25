@@ -162,8 +162,7 @@ abstract class Pagewise<T> extends StatefulWidget {
       required this.itemBuilder,
       this.errorBuilder,
       required this.builder})
-      : assert(showRetry != null),
-        assert((pageLoadController == null &&
+      : assert((pageLoadController == null &&
                 pageSize != null &&
                 pageFuture != null) ||
             (pageLoadController != null &&
@@ -404,7 +403,7 @@ class PagewiseState<T> extends State<Pagewise<T>> {
 class PagewiseLoadController<T> extends ChangeNotifier {
   List<T>? _loadedItems;
   late List _appendedItems;
-  int _numberOfLoadedPages=0;
+  int _numberOfLoadedPages = 0;
   bool? _hasMoreItems;
   Object? _error;
   late bool _isFetching;
@@ -502,6 +501,33 @@ class PagewiseLoadController<T> extends ChangeNotifier {
   void retry() {
     this._error = null;
     this.notifyListeners();
+  }
+
+  // Remove Item
+  void removeItem(bool Function(T item) test) {
+    if (this.loadedItems != null && loadedItems!.isNotEmpty) {
+      this.loadedItems!.removeWhere(test);
+    }
+    this.notifyListeners();
+  }
+
+  // Add item in loaded list
+  void addItem(T item) {
+    if (this.loadedItems != null && loadedItems!.isNotEmpty) {
+      this.loadedItems!.add(item);
+    }
+    this.notifyListeners();
+  }
+
+  // Update item in current loaded list
+  void updateItem(bool Function(T item) currentItem, T newItem) {
+    if (this.loadedItems != null && loadedItems!.isNotEmpty) {
+      int index = this.loadedItems!.indexWhere(currentItem);
+      if (index >= 0) {
+        this.loadedItems!.replaceRange(index, index + 1, [newItem]);
+        this.notifyListeners();
+      }
+    }
   }
 }
 
